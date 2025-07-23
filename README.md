@@ -73,4 +73,48 @@ This circuit cleverly uses a combination of a P-channel MOSFET for high-side swi
 
 4- Auto Power-Off: The Arduino code includes a timer that starts as soon as it powers on. After 10 seconds, the Arduino sets the pin connected to the N-channel transistor to LOW. This turns off the N-channel transistor, which in turn stops pulling the P-channel MOSFET's gate to the ground. A pull-up resistor on the P-channel MOSFET's gate then pulls it high, turning the MOSFET off and cutting power to the entire circuit.
 
+```cpp
+
+const int powerLatch = 4;
+const int TRIG_PIN = 9;
+const int ECHO_PIN = 10;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(powerLatch, OUTPUT);   
+  digitalWrite(powerLatch, HIGH);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  Serial.println("Sensor is now ON. Taking a measurement...");
+  delay(10000);
+  // Turns the power latch circuit off
+  digitalWrite(powerLatch, LOW);
+
+  takeMeasurement();
+  Serial.println("Task finished. Powering off now.");
+  delay(100); 
+ 
+}
+
+void loop() {}
+
+void takeMeasurement() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  long duration = pulseIn(ECHO_PIN, HIGH);
+
+  int distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  delay(2000);
+}
+
+```
 
